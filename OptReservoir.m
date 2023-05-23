@@ -134,7 +134,7 @@ classdef OptReservoir < SLM & CamInterface
             end
 
             n= ceil(sqrt(npxls));
-            img= cropim(img,[n,n]);
+            img= utils.cropim(img,[n,n]);
             img= reshape(img, [], 1);
             pxls= img(1:npxls); 
         end
