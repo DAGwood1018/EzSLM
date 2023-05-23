@@ -1,13 +1,11 @@
-classdef (Abstract) OpticalTweezers < handle
+classdef OpticalTweezers < OpticalPatterns
     % Abstract class for computing dynamic holographic optical tweezers (DHOTs) and then 
     % displaying them on SLM. As the SLM class inherits it.
 
-    properties (Abstract, SetAccess = protected)
-        config Config; % Config instance that stores setup parameters.
-        f; % Focal length of virtual lens. Ignored if focal length given in config.
-    end
-    
     properties (SetAccess = protected)
+       config Config; % Config instance that stores setup parameters.
+       f; % Focal length of virtual lens. Ignored if focal length given in config.
+
        tweezers= {}; % Cell array containing individual tweezer phase masks.
        positions= {}; % Cell array of tweezer positions (it is assumed each phase mask is centered).
        zoffsets= {}; % Cell array of tweezer displacements.
@@ -88,11 +86,52 @@ classdef (Abstract) OpticalTweezers < handle
     end 
 
     methods
+
+       function self = OpticalTweezers(config, varargin)
+            % Constructs a new OpticalTweezers class instance.
+            %
+            % Parameters
+            % - config, Config class instance that gives all 
+            %   setup specific parameters.
+            %
+            % Optional named parameters:
+            %   - 'center' [r,c]  -- Offset within the window.  Negative
+            %     values are offset from the top of the screen.
+            %     Default: `[res(1)+1)/2, res(2)+1)/2]`
+            %   - 'f' float -- Focal length of virtual lens to apply [mm]. 
+            %     Default: `Inf`
+
+            p = inputParser;
+            p.addParameter('center', ...
+                [(config.res(1)+1)/2, (config.res(2)+1)/2]);
+            p.addParameter('f', Inf); 
+            p.KeepUnmatched= true;
+            p.parse(varargin{:});
+
+            self = self@OpticalPatterns(config.res, 'x0', p.Results.center(2), ...
+                'y0', p.Results.center(1) );
+          
+            self.config= config; 
+            self.f= p.Results.f;
+       end
+
+       function set.f(self, f)
+           % Set method for focal length of virtual lens.
+           %
+           % Parameters
+           % - f, focal length in mm. Note f=0 with not produce a virtual lens. 
+
+           assert(isfloat(f) && isscalar(f), 'Focal length should be a scalar float.')
+           if f>0
+              self.f=f;
+           else
+              self.f=Inf;
+           end
+        end
         
-        function reset(self)
+        function reset_tweezers(self)
            % Clears tweezer array.
            %
-           reset@SLM(self);
            self.tweezers= {};
            self.positions= {};
            self.zoffsets= {};
@@ -248,7 +287,7 @@ classdef (Abstract) OpticalTweezers < handle
                 components= trap+twzrs;
             end
 
-            phase = combo_gerchberg_saxton(components,p.Results.alpha,p.Results.N)./(2*pi); %normalize phase
+            phase = gs_algorithm.combo_gerchberg_saxton(components,p.Results.alpha,p.Results.N)./(2*pi); %normalize phase
         end
         
     end

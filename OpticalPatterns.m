@@ -114,7 +114,7 @@ classdef OpticalPatterns < handle
             %   - 'y0' int  -- Y-axis origin. 
             %     Default: `res(1)+1)/2`
 
-            [self.X,self.Y]= self.meshgrid(res, varargin{:});
+            [self.X,self.Y]= OpticalPatterns.meshgrid(res, varargin{:});
             self.rho= sqrt((self.X).^2 + (self.Y).^2);
             self.theta= atan2(self.Y, self.X);
         end

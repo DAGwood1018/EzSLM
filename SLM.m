@@ -1,11 +1,9 @@
-classdef SLM < otslm.utils.ScreenDevice & OpticalPatterns & OpticalTweezers
+classdef SLM < otslm.utils.ScreenDevice & OpticalTweezers
     % Class for displaying images to SLM.
     % Dependent on ScreenDevice class from OTSLM.
 
     properties (SetAccess = protected)
-        config Config; % Config instance that stores setup parameters.
         mask; % Additional phase mask to apply to current state.
-        f; % Focal length of virtual lens. Ignored if focal length given in config.
         LUT; % Look up table function.
     end
     
@@ -39,7 +37,7 @@ classdef SLM < otslm.utils.ScreenDevice & OpticalPatterns & OpticalTweezers
            if self.config.res(1) ~= self.config.res(2)
                 m= max(self.size());
                 sz= [m,m];
-                img= padim(img,sz);
+                img= utils.padim(img,sz);
            end
         end 
 
@@ -49,7 +47,7 @@ classdef SLM < otslm.utils.ScreenDevice & OpticalPatterns & OpticalTweezers
            % Parameters
            % - img, 2D matrix to be enlarged.
            %
-           img = padim(img,self.size());
+           img = utils.padim(img,self.size());
         end
         
         function img = crop(self, img)
@@ -58,7 +56,7 @@ classdef SLM < otslm.utils.ScreenDevice & OpticalPatterns & OpticalTweezers
            % Parameters
            % - img, 2D matrix to be cropped.
            %
-           img = cropim(img,self.size());
+           img = utils.cropim(img,self.size());
         end 
 
         function target = preprocess(self, target)
@@ -105,37 +103,17 @@ classdef SLM < otslm.utils.ScreenDevice & OpticalPatterns & OpticalTweezers
             %     Default: `@(phase) uint8(round(phase.*255)`
 
             p = inputParser;
-            p.addParameter('center', ...
-                [(config.res(1)+1)/2, (config.res(2)+1)/2]);
-            p.addParameter('f', Inf); 
             p.addParameter('LUT', @(phase) uint8(round(phase.*255)) );
+            p.KeepUnmatched= true;
             p.parse(varargin{:});
             
             self = self@otslm.utils.ScreenDevice(config.screen, 'size', config.res, ...
               'pattern_type', 'phase', 'fullscreen', true, 'prescaledPatterns', false);
-            self = self@OpticalPatterns(config.res, 'x0', p.Results.center(2), ...
-                'y0', p.Results.center(1) );
-          
-            self.config= config; 
+            self = self@OpticalTweezers(config, varargin{:} );
+      
             self.mask= config.bckgrnd_phase;
             self.LUT= p.Results.LUT;
-            self.f= p.Results.f;
-            
             self.show_null();
-        end
-
-        function set.f(self, f)
-           % Set method for focal length of virtual lens.
-           %
-           % Parameters
-           % - f, focal length in mm. Note f=0 with not produce a virtual lens. 
-
-           assert(isfloat(f) && isscalar(f), 'Focal length should be a scalar float.')
-           if f>0
-              self.f=f;
-           else
-              self.f=Inf;
-           end
         end
         
         function reset_mask(self)
@@ -210,7 +188,7 @@ classdef SLM < otslm.utils.ScreenDevice & OpticalPatterns & OpticalTweezers
                 I= gpuArray(I);
             end
             
-            phase = self.crop(gerchberg_saxton(I,target,p.Results.alpha,p.Results.N)./(2*pi)); %normalize phase
+            phase = self.crop(gs_algorithm.gerchberg_saxton(I,target,p.Results.alpha,p.Results.N)./(2*pi)); %normalize phase
         end  
         
         function show_null(self, varargin)
@@ -324,7 +302,7 @@ classdef SLM < otslm.utils.ScreenDevice & OpticalPatterns & OpticalTweezers
             assert(M<N, "M must be less than the SLM resolution.");
             assert(mod(M,2)==0, "Only even M is supported.");
             
-            scattering= self.crop(phasemask(N,M));
+            scattering= self.crop(utils.phasemask(N,M));
             self.mask= self.mask + scattering;
         end
 
@@ -342,7 +320,7 @@ classdef SLM < otslm.utils.ScreenDevice & OpticalPatterns & OpticalTweezers
             %
             % See https://en.wikipedia.org/wiki/Zernike_polynomials for more info
 
-            Z= aberration(self.config.res,varargin{:});
+            Z= utils.aberration(self.config.res,varargin{:});
             self.mask= self.mask - Z;
         end
 
