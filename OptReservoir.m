@@ -33,8 +33,7 @@ classdef OptReservoir < SLM & CamInterface
            else
               img= uint8(getdata(vidinput,1));
            end
-           figure(1);
-           imshow(img);
+
            img(img<self.threshold)= 0;
            frame= self.sample(img);
         end
@@ -55,7 +54,7 @@ classdef OptReservoir < SLM & CamInterface
             x_t= double(frame)./255;
             self.update_reservoir(x_t);
        
-            if self.t<=length(self.input)
+            if self.t<length(self.input)
                 self.t= self.t+1;
                 self.update_input(self.input(self.t));
                 self.show(self.state);
@@ -68,7 +67,7 @@ classdef OptReservoir < SLM & CamInterface
 
            stop = false;
            if self.t > 0
-            if self.t > length(self.input)
+            if self.t >= length(self.input)
                 disp("Optical reservoir use completed")
                 stop = true;
                 self.t = -1;
