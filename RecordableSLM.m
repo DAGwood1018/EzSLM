@@ -20,12 +20,14 @@ classdef RecordableSLM < SLM & CamInterface
             % - frame_count, integer number of frames to acquire and
             %   average over.
 
-           img= double(getdata(vidinput,frame_count));
            if frame_count>1
-              img= round(mean(img,4),0); 
+              img= double(getdata(vidinput,frame_count));
+              img= uint8(round(mean(img,4),0)); 
+           else
+              img= uint8(getdata(vidinput,1));
            end
            img(img<self.threshold)= 0;
-           frame= uint8(img);
+           frame= img;
         end
 
         function update_from_cam(self, frame)
