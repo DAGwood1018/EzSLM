@@ -29,3 +29,20 @@ Additonally, you if you want to control the camera through Matlab the required H
 
 <h2> Using SLM Class: </h2>
 
+    config = Config(Name, Value) % Initialize a configuratoin (see Config.m for needed arguments)
+    slm = SLM(config, 'f', ###) % Create an SLM class from the config and give a focal length for a virtual lens
+    
+    phase= slm.compute_phasemask(im, Name, Value) % Compute a phase mask for image 'im'
+    slm.apply_grating(10,False) % Apply a blazed grating pattern to translate image (this is reset after being shown)
+    slm.show(phase) % Display phase on SLM
+    % Could also call slm.play(frames) to play a series of frames
+    
+  If using optical tweezer functionality
+  
+    slm.add( [x1,y1], phase, dz1 ) % Create an arbitrary tweezer at (x1,y2,f+dz1)
+    slm.add_vortex( [x2,y2], l, dz2 ) % Create an optical vortex with angular momentum l at (x2,y2,f+dz2)
+    slm.add_axicon( [x3,y3], G, dz3) % Create an axicon tweezer at (x3,y3,f+dz3)
+    tweezers= slm.compute_tweezers(Name, Value) % Compute tweezer array
+    slm.show(tweezers) % Display tweezers
+    
+    
