@@ -2,16 +2,16 @@
 % a video.
 
 path= "M:\MNIST\TrainImgs";
-vid= VideoWriter("train915.avi");
+vid= VideoWriter("train.avi");
 open(vid)
-for i=1:7999
+for i=1:8000
     file= path + "\[" + string(i) + "].png";
     im= imread(file);
     writeVideo(vid,im);
 end
 close(vid);
-%{
-path= "E:\MNIST\TestImgs";
+
+path= "M:\MNIST\TestImgs";
 vid= VideoWriter("test.avi");
 open(vid)
 for i=1:2000
@@ -20,4 +20,3 @@ for i=1:2000
     writeVideo(vid,im);
 end
 close(vid);
-%}
