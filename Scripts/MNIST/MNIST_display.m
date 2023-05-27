@@ -20,7 +20,7 @@ end
 
 t= tic();
 
-path= "E:\MNIST\Train";
+path= "M:\MNIST\Train";
 save= "M:\MNIST\TrainImgs";
 
 disp("Collecting Training Data")
@@ -42,7 +42,7 @@ end
 
 clear trainset
 
-path= "E:\MNIST\Test";
+path= "M:\MNIST\Test";
 save= "M:\MNIST\TestImgs";
 
 disp("Collecting Testing Data")
