@@ -48,4 +48,12 @@ Additonally, you if you want to control the camera through Matlab the required H
     
 <h2> Using Cam Class: </h2>
 
+Imaging from a camera in Matlab
+
+    camera = Cam(1, 'timeout', Inf) % Control camera 1 with no timeout
+    camera.configure('exposure', -10) % Configure camera properties
+    image = camera.capture() % Capture an image
+    camera.start(Name, Value) % Start recording continuously to video file or buffer.
+    camera.preview() % Preview recording.
+    camera.stop() % Stop recording.
     
