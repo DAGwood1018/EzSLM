@@ -29,9 +29,10 @@ Additonally, you if you want to control the camera through Matlab the required H
 
 <h2> Using SLM Class: </h2>
 
+ Displaying a single phase pattern
+ 
     config = Config(Name, Value) % Initialize a configuratoin (see Config.m for needed arguments)
     slm = SLM(config, 'f', ###) % Create an SLM class from the config and give a focal length for a virtual lens
-    
     phase= slm.compute_phasemask(im, Name, Value) % Compute a phase mask for image 'im'
     slm.apply_grating(10,False) % Apply a blazed grating pattern to translate image (this is reset after being shown)
     slm.show(phase) % Display phase on SLM
@@ -45,4 +46,6 @@ Additonally, you if you want to control the camera through Matlab the required H
     tweezers= slm.compute_tweezers(Name, Value) % Compute tweezer array
     slm.show(tweezers) % Display tweezers
     
+<h2> Using Cam Class: </h2>
+
     
