@@ -57,3 +57,9 @@ Imaging from a camera in Matlab
     camera.preview() % Preview recording.
     camera.stop() % Stop recording.
     
+If using a class that implements CamInterface.m
+
+    camera.manual_logging(nframes) % It is better to repeatedly trigger the camera for this use case. Every trigger nframes are collected.
+    camera.link_device(cam_interface_obj, nframes) % Now, when the camera starts, the cam_interface_obj will be run after every trigger of nframes.
+    camera.start() % This now runs the cam_interface_obj
+    
