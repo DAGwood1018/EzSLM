@@ -1,6 +1,12 @@
 function [T,X] = solve_mackey_glass(x0,tau,dt,N,varargin)
     % Numerically solve the Mackey-Glass equation using 4th order
     % Runge-Kutta
+    %
+    % Parameters
+    % x0, starting x value (between 0 and 1)
+    % tau, time delay for Mackey Glass equation
+    % dt, time step separation
+    % N, number to time steps to compute
 
     MG_eq = @(x,x_lag) mackey_glass.mackey_glass_eq(x,x_lag,varargin{:});
     L= floor(tau/dt);
