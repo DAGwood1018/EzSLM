@@ -5,11 +5,13 @@ mnist= load("mnist.mat");
 path= "M:\MNIST\"; 
 
 c= Config.LCR2500('wl', 473);
-slm= SLM( c, 'f', 200);
+slm= SLM( c, 'f', Inf);
+slm.f = 200;
 
-ID= 5;
-scaling= 10;
+ID= 1;
+scaling= 20;
 input= kron(mnist.training.images(:,:,ID),ones(scaling));
 pattern= slm.compute_phasemask(input,'alpha',0.5,'use_gpu',true,'N',10);
 slm.show(pattern);
+
 
