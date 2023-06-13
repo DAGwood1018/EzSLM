@@ -4,8 +4,8 @@ classdef Config < handle
         screen; % Screen ID corresponding to slm
         res; % Resolution of the slm in pixel
         pitch; % Separation between two pixels from centers
-        bckgrnd_phase; % Phase to always apply to a pattern. 
-        focal_length; % Effective focal length of the imaging lenses in mm.
+        bckgrnd_phase; % Phase to always apply to a pattern. Use this to correct for flaws in the SLM screen.
+        focal_length; % Effective focal length of the imaging lenses in mm (must be given for proper control of tweezers).
         wl; % Wavelength in mm
     end
     
