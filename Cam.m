@@ -248,9 +248,6 @@ classdef Cam < handle
             % any key will end the preview and resume code execution.
 
             preview(self.device)
-            disp("Press a Key to End Preview");
-            pause;
-            stoppreview(self.device)
         end
         
         function start(self, varargin)

@@ -2,10 +2,12 @@ classdef OpticalTweezers < OpticalPatterns
     % Abstract class for computing dynamic holographic optical tweezers (DHOTs) and then 
     % displaying them on SLM. As the SLM class inherits it.
 
+    properties
+        f; % Focal length of virtual lens. Ignored if focal length given in config.
+    end
+
     properties (SetAccess = protected)
        config Config; % Config instance that stores setup parameters.
-       f; % Focal length of virtual lens. Ignored if focal length given in config.
-
        tweezers= {}; % Cell array containing individual tweezer phase masks.
        positions= {}; % Cell array of tweezer positions (it is assumed each phase mask is centered).
        zoffsets= {}; % Cell array of tweezer displacements.
@@ -13,7 +15,7 @@ classdef OpticalTweezers < OpticalPatterns
     end
     
     methods (Access = protected, Static)
-        
+
         function param = parse_twzr_param(param, ntwzrs)
             % Parses a parameter(s) for a new tweezer.
             %
@@ -32,6 +34,37 @@ classdef OpticalTweezers < OpticalPatterns
     end
 
      methods (Access = protected)
+        
+        function img = resize(self, img)
+           % Resizes a image to be square if screen resolution isn't.
+           %
+           % Parameters
+           % - img, 2D matrix to be resized.
+
+           if self.config.res(1) ~= self.config.res(2)
+                m= max(self.size());
+                sz= [m,m];
+                img= utils.padim(img,sz);
+           end
+        end 
+
+        function img = pad(self, img)
+           % Enlarges an image to the size of the screen.
+           %
+           % Parameters
+           % - img, 2D matrix to be enlarged.
+           %
+           img = utils.padim(img,self.size());
+        end
+        
+        function img = crop(self, img)
+           % Crops an image to the size of the screen.
+           %
+           % Parameters
+           % - img, 2D matrix to be cropped.
+           %
+           img = utils.cropim(img,self.size());
+        end 
 
         function pos = parse_positions(self, pos)
             % Parses a tweezer positions.
@@ -113,6 +146,12 @@ classdef OpticalTweezers < OpticalPatterns
           
             self.config= config; 
             self.f= p.Results.f;
+       end
+
+       function sz = size(self)
+            % Returns the pixel resolution of the SLM display.
+            %
+            sz = self.config.res;
        end
 
        function set.f(self, f)
@@ -262,32 +301,41 @@ classdef OpticalTweezers < OpticalPatterns
           %     Default: `1` 
           %   - 'N' int  -- Number of iterations to perfrom GS algorithm.
           %     Default: `10`
+          %   - 'padding' int -- Padding to add to all images when
+          %      performing calculations. 
           %   - 'use_gpu' bool -- Whether to use gpu to calculate phase mask. 
           %     Default: `false`
 
             p = inputParser;
             p.addParameter('alpha', 1);
             p.addParameter('N', 10);
+            p.addParameter('padding', 100);
             p.addParameter('use_gpu', false);
             p.parse(varargin{:});
             
+            padding= [p.Results.padding,p.Results.padding];
+            sz = max(self.config.res) + 2*p.Results.padding;
+
             dz= cell2mat(self.zoffsets);
             pos= transpose(cell2mat(cellfun(@(x)reshape(x,2,1),self.positions,'un',0)));
             twzrs= reshape(cell2mat(cellfun(@(x)reshape(x,self.config.res(1),self.config.res(2),[]) ... 
                 ,self.tweezers,'un',0)),self.config.res(1),self.config.res(2),self.N);
 
-            trap = zeros(self.config.res(1),self.config.res(2),self.N);
+            traps = zeros(sz,sz,self.N);
+            padded_twzrs =  zeros(sz,sz,self.N);
             for i=1:self.N
-                trap(:,:,i) = (2*pi).*( self.xylens(pos(i,:)) + self.zlens(dz(i)) );
+                trap= (2*pi).*( self.xylens(pos(i,:)) + self.zlens(dz(i)));
+                traps(:,:,i) = padarray(self.resize(trap),padding,0,'both');
+                padded_twzrs(:,:,i) = padarray(self.resize(twzrs(:,:,i)),padding,0,'both');
             end
 
             if p.Results.use_gpu
-                components= gpuArray(trap+twzrs);
+                components= gpuArray(traps+padded_twzrs);
             else
-                components= trap+twzrs;
+                components= traps+twzrs;
             end
 
-            phase = gs_algorithm.combo_gerchberg_saxton(components,p.Results.alpha,p.Results.N)./(2*pi); %normalize phase
+            phase = self.crop(gs_algorithm.combo_gerchberg_saxton(components,p.Results.alpha,p.Results.N)./(2*pi)); %normalize phase
         end
         
     end

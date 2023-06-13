@@ -33,12 +33,6 @@ classdef OptReservoir < SLM & CamInterface
            else
               img= uint8(getdata(vidinput,1));
            end
-<<<<<<< HEAD
-           figure(1);
-           imshow(img);
-=======
-
->>>>>>> 5fac894f1683998025b4112813eb41c6dfe584f9
            img(img<self.threshold)= 0;
            frame= self.sample(img);
         end
