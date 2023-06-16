@@ -1,3 +1,4 @@
+
 classdef RecordableSLM < SLM & CamInterface
     
     properties (SetAccess = protected)

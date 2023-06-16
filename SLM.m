@@ -27,38 +27,7 @@ classdef SLM < otslm.utils.ScreenDevice & OpticalTweezers
     end
     
     methods (Access = protected)
-
-        function img = resize(self, img)
-           % Resizes a image to be square if screen resolution isn't.
-           %
-           % Parameters
-           % - img, 2D matrix to be resized.
-
-           if self.config.res(1) ~= self.config.res(2)
-                m= max(self.size());
-                sz= [m,m];
-                img= utils.padim(img,sz);
-           end
-        end 
-
-        function img = pad(self, img)
-           % Enlarges an image to the size of the screen.
-           %
-           % Parameters
-           % - img, 2D matrix to be enlarged.
-           %
-           img = utils.padim(img,self.size());
-        end
         
-        function img = crop(self, img)
-           % Crops an image to the size of the screen.
-           %
-           % Parameters
-           % - img, 2D matrix to be cropped.
-           %
-           img = utils.cropim(img,self.size());
-        end 
-
         function target = preprocess(self, target)
             % Checks and preprocesses target patterns.
             %
