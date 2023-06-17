@@ -1,4 +1,4 @@
-# EasySLM/Scripts/ReservoirComputing
+# EasySLM/Scripts/MNIST
 
 Scripts for collected scattered MNIST digits. 
 
