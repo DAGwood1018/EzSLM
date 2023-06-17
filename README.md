@@ -23,7 +23,6 @@ Additonally, you if you want to control the camera through Matlab the required H
     <li> SLM.m : Extends OTSLM ScreenDevice & OpticalTweezers classes and acts as a superclass for calculating and displaying arbitrary phase patterns to an SLM. This is the only class that depends directly on the OTSLM package. </li>
     <li> CamInterface.m : Abstract class that establishes the methods that should be implemented to link a classes functionality to a Cam object. </li>
     <li> Cam.m : Camera object useful for capturing snapshots from a camera. </li>
-    <li> OptReservoir.m : Extends the SLM class and implements a feedback loop between SLM and camera for applications to optical reservoir computing. This class implements CamInterface. </li>
     <li> RecordableSLM.m : Extends the SLM class to implement automatic display and imaging capabilities. This class implements CamInterface.
 </ul>
 
